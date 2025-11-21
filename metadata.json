@@ -1,0 +1,7 @@
+{
+  "name": "Avo Carbon Risk Radar",
+  "description": "Ein umfassendes Risiko-Dashboard für Avo Carbon Germany zur Überwachung externer Bedrohungen in Logistik, Geopolitik, Wetter und Markt.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
