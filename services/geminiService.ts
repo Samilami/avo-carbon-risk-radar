@@ -61,14 +61,19 @@ export const fetchRiskAnalysis = async (
   
   const ai = new GoogleGenAI({ apiKey });
   
-  const systemInstruction = `Du bist ein Senior Risikoanalyst für Avo Carbon Germany. 
+  const now = new Date();
+  const currentDate = now.toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
+
+  const systemInstruction = `Du bist ein Senior Risikoanalyst für Avo Carbon Germany.
   Antworte professionell auf Deutsch.
+  WICHTIG: Heute ist ${currentDate}. Nutze NUR aktuelle Daten aus 2025 und den letzten Wochen/Monaten.
   Fokus: Fakten, PREISE, DATEN und TRENDS.
-  
+
   FORMAT:
   1. Start: [NIEDRIG], [MITTEL], [HOCH] oder [KRITISCH].
   2. Bei Preisen: (TREND: STEIGEND/FALLEND/STABIL).
   3. Nutze **Fett** für Zahlen.
+  4. Verwende ECHTE aktuelle Marktdaten, keine veralteten Informationen aus 2023 oder 2024.
   `;
 
   try {
@@ -136,42 +141,45 @@ export const streamRiskAnalysis = async (
   apiKey: string, 
   onReportLoaded: (report: RiskReport) => void
 ) => {
+  const now = new Date();
+  const currentMonth = now.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+
   const prompts: { cat: RiskCategory; text: string }[] = [
     {
       cat: 'Wetter',
-      text: "Extremwetter? Frankfurt, Indien, China, Tunesien."
+      text: `Aktuelle Extremwetter-Situation ${currentMonth}: Frankfurt, Indien, China, Tunesien. Welche aktuellen Wetterrisiken gibt es HEUTE/diese Woche?`
     },
     {
       cat: 'Logistik',
-      text: "Risiken: Hamburger Hafen, Suezkanal, Luftfracht."
+      text: `Aktuelle Logistik-Risiken ${currentMonth}: Hamburger Hafen, Suezkanal, Luftfracht. Was sind die neuesten Entwicklungen?`
     },
     {
       cat: 'Rohstoffe',
-      text: "KUPFER und GRAPHIT Preise (USD/Tonne). Aktuelle Preise mit genauen Zahlen. Trend? Preisentwicklung letzte 3 Monate."
+      text: `KUPFER und GRAPHIT aktuelle Preise ${currentMonth} (USD/Tonne). Genaue Zahlen der letzten Wochen. Welcher Trend zeigt sich aktuell (letzte 4-8 Wochen)? Nutze aktuelle Börsen-/Marktdaten.`
     },
     {
       cat: 'Energie',
-      text: "Industriestrom und Erdgas Preise Deutschland. Trend?"
+      text: `Industriestrom und Erdgas Preise Deutschland ${currentMonth}. Aktuelle Preise in Cent/kWh bzw. EUR/MWh. Trend der letzten Wochen? Nutze aktuelle Energiemarkt-Daten.`
     },
     {
       cat: 'Verkehr',
-      text: "Detaillierte Verkehrslage: Frankfurt am Main (A3, A5, A66), Hessen (A7, A45), Deutschland Hauptrouten, Europa Transitwege. Staus, Baustellen, Unfälle. Durchschnittliche LKW-Transportkosten pro Kilometer in EUR aktuell."
+      text: `Aktuelle Verkehrslage ${currentMonth}: Frankfurt am Main (A3, A5, A66), Hessen (A7, A45), Deutschland Hauptrouten, Europa Transitwege. Gibt es HEUTE/diese Woche Staus, Baustellen, Unfälle? Durchschnittliche LKW-Transportkosten pro Kilometer in EUR (aktuell 2025).`
     },
     {
       cat: 'Politik',
-      text: "Politik Risiken: Gesetze DE, China/Russland/Nahost."
+      text: `Aktuelle politische Risiken ${currentMonth}: Neue Gesetze/Regulierungen Deutschland, China/Russland/Nahost. Was sind die neuesten Entwicklungen?`
     },
     {
       cat: 'Wirtschaft',
-      text: "Autoindustrie Wirtschaftslage: Inflation, Zinsen."
+      text: `Autoindustrie Wirtschaftslage ${currentMonth}: Aktuelle Inflation, Zinsen, Konjunktur. Was sind die neuesten Zahlen und Trends?`
     },
     {
       cat: 'Kunden',
-      text: "News: Bosch, Nidec, Mahle, Denso, Valeo."
+      text: `Aktuelle News ${currentMonth}: Bosch, Nidec, Mahle, Denso, Valeo. Welche neuen Entwicklungen gibt es bei diesen Unternehmen?`
     },
     {
       cat: 'Feiertage',
-      text: "Feiertage (4 Wochen): Indien, China, Tunesien, FR."
+      text: `Kommende Feiertage (nächste 4 Wochen ab ${currentMonth}): Indien, China, Tunesien, Frankreich. Welche Feiertage stehen an?`
     }
   ];
 
@@ -188,8 +196,12 @@ export const streamRiskAnalysis = async (
 
 export const fetchCommodityHistory = async (apiKey: string, topic: string): Promise<HistoryDataPoint[]> => {
   const ai = new GoogleGenAI({ apiKey });
-  
-  const prompt = `Historische Preise für ${topic} (letzte 6 Monate). JSON.`;
+
+  // Get current date to ensure we request 2025 data
+  const now = new Date();
+  const currentMonth = now.toLocaleString('de-DE', { month: 'long', year: 'numeric' });
+
+  const prompt = `WICHTIG: Heute ist ${currentMonth}. Liefere die aktuellsten verfügbaren Preise für ${topic} der letzten 6 Monate (von ${now.getMonth() - 5 < 0 ? 12 + (now.getMonth() - 5) : now.getMonth() - 5}/2024 bis ${currentMonth}). Nutze ECHTE aktuelle Marktdaten, keine historischen Daten aus 2023. JSON Format mit label (z.B. "Nov 2024"), value (Zahl), unit (Einheit).`;
 
   try {
     const response = await withRetry(async () => {
@@ -197,6 +209,7 @@ export const fetchCommodityHistory = async (apiKey: string, topic: string): Prom
         model: "gemini-2.5-flash",
         contents: prompt,
         config: {
+          tools: [{ googleSearch: {} }],
           responseMimeType: "application/json",
           responseSchema: {
             type: Type.ARRAY,
