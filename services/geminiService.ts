@@ -147,7 +147,7 @@ export const streamRiskAnalysis = async (
     },
     {
       cat: 'Rohstoffe',
-      text: "KUPFER und GRAPHIT Preise (USD/Tonne). Trend?"
+      text: "KUPFER und GRAPHIT Preise (USD/Tonne). Aktuelle Preise mit genauen Zahlen. Trend? Preisentwicklung letzte 3 Monate."
     },
     {
       cat: 'Energie',
@@ -155,7 +155,7 @@ export const streamRiskAnalysis = async (
     },
     {
       cat: 'Verkehr',
-      text: "LKW Verkehr: Frankfurt, Hessen, Autobahnen."
+      text: "Detaillierte Verkehrslage: Frankfurt am Main (A3, A5, A66), Hessen (A7, A45), Deutschland Hauptrouten, Europa Transitwege. Staus, Baustellen, Unfälle. Durchschnittliche LKW-Transportkosten pro Kilometer in EUR aktuell."
     },
     {
       cat: 'Politik',

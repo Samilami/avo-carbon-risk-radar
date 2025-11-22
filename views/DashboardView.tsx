@@ -91,13 +91,22 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ reports, history, 
             <Card className="xl:col-span-1 flex flex-col justify-center">
               <SimpleLineChart data={history.copper} color="#d97706" title="Kupfer (LME) Entwicklung" />
             </Card>
-             <Card className="xl:col-span-1 flex flex-col justify-center">
+            <Card className="xl:col-span-1 flex flex-col justify-center">
               <SimpleLineChart data={history.electricity} color="#3b82f6" title="Strompreis (DE) Entwicklung" />
             </Card>
-            <Card className="xl:col-span-1 flex flex-col justify-center bg-slate-800/50 border-dashed border-slate-700">
-              <div className="text-center">
-                <h4 className="text-sm font-bold text-slate-400 mb-2">Graphit & Gas</h4>
-                <p className="text-xs text-slate-500">Weitere Daten werden geladen...</p>
+            <Card className="xl:col-span-1 flex flex-col justify-center">
+              <SimpleLineChart data={history.graphite} color="#8b5cf6" title="Graphit Preisentwicklung" />
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+            <Card className="flex flex-col justify-center">
+              <SimpleLineChart data={history.transportCost} color="#10b981" title="LKW Transportkosten (EUR/km)" />
+            </Card>
+            <Card className="flex flex-col justify-center bg-slate-800/50 border-dashed border-slate-700">
+              <div className="text-center py-8">
+                <h4 className="text-sm font-bold text-slate-400 mb-2">Weitere Metriken</h4>
+                <p className="text-xs text-slate-500">Zusätzliche Daten werden in zukünftigen Updates verfügbar sein</p>
               </div>
             </Card>
           </div>

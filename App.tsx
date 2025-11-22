@@ -22,7 +22,7 @@ const App: React.FC = () => {
   const [state, setState] = useState<AppState>({
     activeView: 'dashboard',
     reports: [],
-    history: { copper: [], electricity: [] },
+    history: { copper: [], electricity: [], graphite: [], transportCost: [] },
     isLoading: false,
     apiKey: localStorage.getItem('gemini_api_key') || process.env.API_KEY || null
   });
@@ -40,7 +40,7 @@ const App: React.FC = () => {
 
   const handleClearKey = () => {
     localStorage.removeItem('gemini_api_key');
-    setState(prev => ({ ...prev, apiKey: null, reports: [], history: { copper: [], electricity: [] } }));
+    setState(prev => ({ ...prev, apiKey: null, reports: [], history: { copper: [], electricity: [], graphite: [], transportCost: [] } }));
   };
 
   const handleRefresh = async () => {
@@ -58,18 +58,28 @@ const App: React.FC = () => {
       // 2. Fetch history data
       // MAJOR COOL-DOWN: Wait 20 seconds before hitting the API again for history
       // This resets the quota window.
-      await new Promise(r => setTimeout(r, 20000)); 
+      await new Promise(r => setTimeout(r, 20000));
 
       const copperData = await fetchCommodityHistory(state.apiKey, "Kupferpreis (LME)");
       setState(prev => ({ ...prev, history: { ...prev.history, copper: copperData }}));
-      
+
       await new Promise(r => setTimeout(r, 10000)); // 10s delay between history items
-      
+
       const electricityData = await fetchCommodityHistory(state.apiKey, "Industriestrompreis Deutschland");
-      setState(prev => ({ 
-        ...prev, 
-        history: { ...prev.history, electricity: electricityData },
-        isLoading: false 
+      setState(prev => ({ ...prev, history: { ...prev.history, electricity: electricityData }}));
+
+      await new Promise(r => setTimeout(r, 10000)); // 10s delay between history items
+
+      const graphiteData = await fetchCommodityHistory(state.apiKey, "Graphitpreis (USD/Tonne)");
+      setState(prev => ({ ...prev, history: { ...prev.history, graphite: graphiteData }}));
+
+      await new Promise(r => setTimeout(r, 10000)); // 10s delay between history items
+
+      const transportData = await fetchCommodityHistory(state.apiKey, "LKW Transportkosten Deutschland (EUR pro Kilometer)");
+      setState(prev => ({
+        ...prev,
+        history: { ...prev.history, transportCost: transportData },
+        isLoading: false
       }));
       
       setLastUpdate(new Date());

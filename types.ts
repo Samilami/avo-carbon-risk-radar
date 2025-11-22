@@ -29,6 +29,8 @@ export interface HistoryDataPoint {
 export interface CommodityHistory {
   copper: HistoryDataPoint[];
   electricity: HistoryDataPoint[];
+  graphite: HistoryDataPoint[];
+  transportCost: HistoryDataPoint[];
 }
 
 export interface AppState {
