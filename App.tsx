@@ -243,13 +243,6 @@ const App: React.FC = () => {
         {/* Header */}
         <header className="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 p-6 flex justify-between items-center z-10 sticky top-0">
           <div className="flex items-center gap-6">
-            <div className="bg-white p-2 rounded-lg h-14 w-auto shadow-sm flex items-center justify-center px-4">
-                 <img
-                   src={avoLogo}
-                   alt="Avo Carbon Logo"
-                   className="h-full w-auto object-contain"
-                 />
-            </div>
             <div>
               <h1 className="text-2xl font-bold text-white">{getHeaderTitle()}</h1>
               <p className="text-sm text-slate-400 mt-1">Live Intelligence für kritisches Risikomanagement</p>
