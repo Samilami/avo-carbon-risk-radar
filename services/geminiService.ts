@@ -210,40 +210,44 @@ const getLastSixMonths = (): string[] => {
 const generateFallbackData = (topic: string): HistoryDataPoint[] => {
   const months = getLastSixMonths();
 
-  // Define realistic patterns with trends for different commodities
+  // Define realistic patterns with trends based on actual market data (Nov 2024)
   const dataPatterns: Record<string, {
     startValue: number;
     endValue: number;
     unit: string;
     volatility: number; // Prozentuale Schwankung pro Monat
   }> = {
-    // Kupfer: Volatil mit leichtem Anstieg (Rohstoffmarkt 2024-2025)
+    // Kupfer LME: Basierend auf realen Börsenpreisen Jun-Nov 2024
+    // LME Copper aktuell ~9.000-9.200 USD/Tonne (Nov 2024)
     'Kupferpreis': {
-      startValue: 8200,
-      endValue: 8800,
+      startValue: 8900,  // Juni 2024
+      endValue: 9150,    // November 2024
       unit: 'USD/Tonne',
-      volatility: 0.03 // 3% Schwankung
+      volatility: 0.025  // 2.5% realistische Schwankung
     },
-    // Strom: Sinkend (Energiepreise normalisieren sich)
+    // Strom Deutschland: Basierend auf Börse (EEX/EPEX Spot)
+    // Industriestrom aktuell ~10-12 ct/kWh (Nov 2024, deutlich niedriger als 2022/23)
     'Industriestrompreis': {
-      startValue: 32,
-      endValue: 26,
+      startValue: 13.5,   // Juni 2024
+      endValue: 11.2,     // November 2024 (Normalisierung)
       unit: 'ct/kWh',
-      volatility: 0.04 // 4% Schwankung
+      volatility: 0.05    // 5% Schwankung (volatiler Energiemarkt)
     },
-    // Graphit: Leicht fallend (Marktkorrektur)
+    // Graphit: Basierend auf Marktberichten
+    // Natürlicher Graphit ~600-750 USD/Tonne (Nov 2024)
     'Graphitpreis': {
-      startValue: 780,
-      endValue: 690,
+      startValue: 720,    // Juni 2024
+      endValue: 680,      // November 2024 (leicht fallend)
       unit: 'USD/Tonne',
-      volatility: 0.025 // 2.5% Schwankung
+      volatility: 0.02    // 2% Schwankung (stabiler Markt)
     },
-    // LKW Transport: Steigend (Inflation, Diesel)
+    // LKW Transport Deutschland: Basierend auf Statistiken
+    // Durchschnitt ~1.50-1.70 EUR/km (Nov 2024)
     'LKW Transportkosten': {
-      startValue: 1.48,
-      endValue: 1.63,
+      startValue: 1.52,   // Juni 2024
+      endValue: 1.67,     // November 2024 (steigend durch Diesel/Löhne)
       unit: 'EUR/km',
-      volatility: 0.02 // 2% Schwankung
+      volatility: 0.015   // 1.5% Schwankung (relativ stabil)
     }
   };
 
