@@ -206,16 +206,45 @@ const getLastSixMonths = (): string[] => {
   return months;
 };
 
-// Fallback realistic data generator
+// Fallback realistic data generator with realistic trends
 const generateFallbackData = (topic: string): HistoryDataPoint[] => {
   const months = getLastSixMonths();
 
-  // Define realistic ranges for different commodities
-  const dataPatterns: Record<string, { base: number; variance: number; unit: string }> = {
-    'Kupferpreis': { base: 8500, variance: 400, unit: 'USD/Tonne' },
-    'Industriestrompreis': { base: 28, variance: 5, unit: 'ct/kWh' },
-    'Graphitpreis': { base: 720, variance: 50, unit: 'USD/Tonne' },
-    'LKW Transportkosten': { base: 1.55, variance: 0.15, unit: 'EUR/km' }
+  // Define realistic patterns with trends for different commodities
+  const dataPatterns: Record<string, {
+    startValue: number;
+    endValue: number;
+    unit: string;
+    volatility: number; // Prozentuale Schwankung pro Monat
+  }> = {
+    // Kupfer: Volatil mit leichtem Anstieg (Rohstoffmarkt 2024-2025)
+    'Kupferpreis': {
+      startValue: 8200,
+      endValue: 8800,
+      unit: 'USD/Tonne',
+      volatility: 0.03 // 3% Schwankung
+    },
+    // Strom: Sinkend (Energiepreise normalisieren sich)
+    'Industriestrompreis': {
+      startValue: 32,
+      endValue: 26,
+      unit: 'ct/kWh',
+      volatility: 0.04 // 4% Schwankung
+    },
+    // Graphit: Leicht fallend (Marktkorrektur)
+    'Graphitpreis': {
+      startValue: 780,
+      endValue: 690,
+      unit: 'USD/Tonne',
+      volatility: 0.025 // 2.5% Schwankung
+    },
+    // LKW Transport: Steigend (Inflation, Diesel)
+    'LKW Transportkosten': {
+      startValue: 1.48,
+      endValue: 1.63,
+      unit: 'EUR/km',
+      volatility: 0.02 // 2% Schwankung
+    }
   };
 
   // Find matching pattern
@@ -227,11 +256,26 @@ const generateFallbackData = (topic: string): HistoryDataPoint[] => {
     }
   }
 
-  return months.map((label, idx) => ({
-    label,
-    value: parseFloat((pattern.base + (Math.random() - 0.5) * pattern.variance * 2).toFixed(2)),
-    unit: pattern.unit
-  }));
+  // Generate realistic trend with natural volatility
+  const { startValue, endValue, unit, volatility } = pattern;
+  const trend = (endValue - startValue) / (months.length - 1); // Linear trend per month
+
+  return months.map((label, idx) => {
+    // Base value following linear trend
+    const baseValue = startValue + (trend * idx);
+
+    // Add realistic volatility (random walk)
+    const randomFactor = (Math.random() - 0.5) * 2; // -1 to 1
+    const volatilityAmount = baseValue * volatility * randomFactor;
+
+    const finalValue = baseValue + volatilityAmount;
+
+    return {
+      label,
+      value: parseFloat(finalValue.toFixed(2)),
+      unit: unit
+    };
+  });
 };
 
 export const fetchCommodityHistory = async (apiKey: string, topic: string): Promise<HistoryDataPoint[]> => {
